@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'game.dart';
+import 'operation.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -80,11 +80,11 @@ class WelcomeScreen extends StatelessWidget {
                         width: 170,
                         height: 170,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.deepPurple.withOpacity(0.12),
+                              color: Colors.deepPurple.withValues(alpha: 0.12),
                               blurRadius: 25,
                               offset: const Offset(0, 10),
                             ),
@@ -225,7 +225,7 @@ class WelcomeScreen extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Text(
@@ -250,8 +250,8 @@ class WelcomeScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const GameScreen(),
-                      ),
+                                builder: (context) =>  OperationScreen(),
+                              ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -259,7 +259,7 @@ class WelcomeScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                             elevation: 7,
                             shadowColor:
-                                const Color(0xFF6C4AB6).withOpacity(0.35),
+                                const Color(0xFF6C4AB6).withValues(alpha: 0.35),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(22),
                             ),
@@ -295,7 +295,7 @@ class WelcomeScreen extends StatelessWidget {
                           vertical: 15,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.72),
+                          color: Colors.white.withValues(alpha: 0.72),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: Colors.white,

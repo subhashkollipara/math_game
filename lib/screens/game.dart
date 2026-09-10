@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dart:math';
-
+import 'progress.dart';
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
@@ -21,6 +21,8 @@ class _GameScreenState extends State<GameScreen> {
   int correctAnswers = 0;
   int wrongAnswers = 0;
   double accuracy = 0;
+  int levelQuestions = 0;
+  int levelCorrectAnswers = 0;
 
   final int questionsPerLevel = 10;
 
@@ -83,8 +85,9 @@ class _GameScreenState extends State<GameScreen> {
   // --------------------------------------------------
 
   void generateQuestion() {
-    number1 = random.nextInt(50) + 1;
-    number2 = random.nextInt(50) + 1;
+    int maxnumber = 10 * gameProgress.additionLevel;
+    number1 = random.nextInt(maxnumber) + 1;
+    number2 = random.nextInt(maxnumber) + 1;
 
     operation = '+';
 
@@ -122,19 +125,32 @@ class _GameScreenState extends State<GameScreen> {
       isCorrect = userAnswer == correctAnswer;
 
       totalQuestions++;
+      levelQuestions++;
 
       if (isCorrect == true) {
         correctAnswers++;
+        levelCorrectAnswers++;
       } else {
         wrongAnswers++;
       }
 
-      accuracy = (correctAnswers / totalQuestions) * 100;
+      accuracy = (levelCorrectAnswers / levelQuestions) * 100;
 
-      if (totalQuestions == questionsPerLevel) {
-        debugPrint('--- LEVEL COMPLETE ---');
-        debugPrint('Correct: $correctAnswers / $totalQuestions');
+      if (levelQuestions == questionsPerLevel) {
+        debugPrint('--- LEVEL ${gameProgress.additionLevel} COMPLETE ---');
+        debugPrint('Correct: $levelCorrectAnswers / $levelQuestions');
         debugPrint('Accuracy: ${accuracy.toStringAsFixed(1)}%');
+
+        if (accuracy >= 80) {
+          gameProgress.additionLevel++;
+
+          debugPrint('LEVEL UP! New Level: $gameProgress.additionLevel');
+        } else {
+          debugPrint('Level remains at $gameProgress.additionLevel');
+        }
+
+        levelQuestions = 0;
+        levelCorrectAnswers = 0;
       }
     });
 
@@ -276,9 +292,9 @@ class _GameScreenState extends State<GameScreen> {
 
                         children: [
                           // LEVEL
-                          const Text(
-                            'LEVEL 1',
-                            style: TextStyle(
+                          Text(
+                            'LEVEL ${gameProgress.additionLevel}',
+                            style:const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

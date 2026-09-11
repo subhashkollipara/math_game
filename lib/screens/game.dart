@@ -4,7 +4,12 @@ import 'package:flutter/services.dart';
 import 'dart:math';
 import 'progress.dart';
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+    final String operation;
+
+  const GameScreen({
+    super.key,
+    required this.operation,
+});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -85,9 +90,22 @@ class _GameScreenState extends State<GameScreen> {
   // --------------------------------------------------
 
   void generateQuestion() {
-    int maxnumber = 10 * gameProgress.additionLevel;
-    number1 = random.nextInt(maxnumber) + 1;
-    number2 = random.nextInt(maxnumber) + 1;
+int currentLevel = gameProgress.additionLevel;
+
+int maxNumber;
+
+if (currentLevel == 1) {
+  maxNumber = 10;
+} else if (currentLevel == 2) {
+  maxNumber = 50;
+} else if (currentLevel == 3) {
+  maxNumber = 100;
+} else if (currentLevel == 4) {
+  maxNumber = 500;
+} else {
+  maxNumber = 1000;
+}    number1 = random.nextInt(maxNumber) + 1;
+    number2 = random.nextInt(maxNumber) + 1;
 
     operation = '+';
 
@@ -109,7 +127,7 @@ class _GameScreenState extends State<GameScreen> {
   // SUBMIT ANSWER
   // --------------------------------------------------
 
-  void submitAnswer() {
+  Future<void> submitAnswer() async {
     if (answer.isEmpty || questionStartTime == null) {
       return;
     }
@@ -144,15 +162,17 @@ class _GameScreenState extends State<GameScreen> {
         if (accuracy >= 80) {
           gameProgress.additionLevel++;
 
-          debugPrint('LEVEL UP! New Level: $gameProgress.additionLevel');
+          debugPrint('LEVEL UP! New Level: ${gameProgress.additionLevel}');
         } else {
-          debugPrint('Level remains at $gameProgress.additionLevel');
+          debugPrint('Level remains at ${gameProgress.additionLevel}s');
         }
 
         levelQuestions = 0;
         levelCorrectAnswers = 0;
       }
     });
+              await gameProgress.saveProgress();
+
 
     debugPrint(
       'Answer: $userAnswer | '

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'screens/welcome.dart';
+import 'screens/progress.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await gameProgress.loadProgress();
+
   runApp(const PersonalisedMathGame());
 }
 

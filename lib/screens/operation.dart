@@ -109,7 +109,10 @@ class OperationScreen extends StatelessWidget {
           ? () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const GameScreen()),
+                MaterialPageRoute(builder: (context) =>  GameScreen(
+                    operation: operation,
+
+                )),
               );
             }
           : null,

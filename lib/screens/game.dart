@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dart:math';
-import 'progress.dart';
-class GameScreen extends StatefulWidget {
-    final String operation;
 
-  const GameScreen({
-    super.key,
-    required this.operation,
-});
+import 'progress.dart';
+
+class GameScreen extends StatefulWidget {
+  final String operation;
+
+  const GameScreen({super.key, required this.operation});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -90,26 +89,57 @@ class _GameScreenState extends State<GameScreen> {
   // --------------------------------------------------
 
   void generateQuestion() {
-int currentLevel = gameProgress.additionLevel;
+    int currentLevel;
 
-int maxNumber;
+    if (widget.operation == '+') {
+      currentLevel = gameProgress.additionLevel;
+    } else if (widget.operation == '-') {
+      currentLevel = gameProgress.subtractionLevel;
+    } else if (widget.operation == '*') {
+      currentLevel = gameProgress.multiplicationLevel;
+    } else {
+      currentLevel = gameProgress.divisionLevel;
+    }
+    int maxNumber;
 
-if (currentLevel == 1) {
-  maxNumber = 10;
-} else if (currentLevel == 2) {
-  maxNumber = 50;
-} else if (currentLevel == 3) {
-  maxNumber = 100;
-} else if (currentLevel == 4) {
-  maxNumber = 500;
-} else {
-  maxNumber = 1000;
-}    number1 = random.nextInt(maxNumber) + 1;
+    if (currentLevel == 1) {
+      maxNumber = 10;
+    } else if (currentLevel == 2) {
+      maxNumber = 50;
+    } else if (currentLevel == 3) {
+      maxNumber = 100;
+    } else if (currentLevel == 4) {
+      maxNumber = 500;
+    } else {
+      maxNumber = 1000;
+    }
+    number1 = random.nextInt(maxNumber) + 1;
     number2 = random.nextInt(maxNumber) + 1;
 
-    operation = '+';
+    operation = widget.operation;
 
-    correctAnswer = number1 + number2;
+    if (operation == '+') {
+      correctAnswer = number1 + number2;
+    } else if (operation == '-') {
+      // Prevent negative answers
+      if (number1 < number2) {
+        final temp = number1;
+        number1 = number2;
+        number2 = temp;
+      }
+
+      correctAnswer = number1 - number2;
+    } else if (operation == '*') {
+      correctAnswer = number1 * number2;
+    } else if (operation == '/') {
+      // Make division produce a whole-number answer
+      correctAnswer = number1;
+
+      number2 = random.nextInt(maxNumber) + 1;
+      number1 = number2 * (random.nextInt(maxNumber) + 1);
+
+      correctAnswer = number1 ~/ number2;
+    }
 
     answer = '';
     answerController.clear();
@@ -160,19 +190,42 @@ if (currentLevel == 1) {
         debugPrint('Accuracy: ${accuracy.toStringAsFixed(1)}%');
 
         if (accuracy >= 80) {
-          gameProgress.additionLevel++;
+          if (widget.operation == '+') {
+            gameProgress.additionLevel++;
 
-          debugPrint('LEVEL UP! New Level: ${gameProgress.additionLevel}');
-        } else {
-          debugPrint('Level remains at ${gameProgress.additionLevel}s');
+            if (gameProgress.additionLevel >= 2) {
+              gameProgress.subtractionLevel = 1;
+            }
+
+            debugPrint('Addition Level: ${gameProgress.additionLevel}');
+          } else if (widget.operation == '-') {
+            gameProgress.subtractionLevel++;
+            if (gameProgress.subtractionLevel >= 2) {
+              gameProgress.multiplicationLevel = 1;
+            }
+
+            debugPrint('Subtraction Level: ${gameProgress.subtractionLevel}');
+          } else if (widget.operation == '*') {
+            gameProgress.multiplicationLevel++;
+            if (gameProgress.multiplicationLevel >= 2) {
+              gameProgress.divisionLevel = 1;
+            }
+            debugPrint(
+              'Multiplication Level: ${gameProgress.multiplicationLevel}',
+            );
+          } else if (widget.operation == '/') {
+            gameProgress.divisionLevel++;
+            debugPrint('Division Level: ${gameProgress.divisionLevel}');
+          } else {
+            debugPrint('Level remains at ${gameProgress.additionLevel}s');
+          }
+
+          levelQuestions = 0;
+          levelCorrectAnswers = 0;
         }
-
-        levelQuestions = 0;
-        levelCorrectAnswers = 0;
       }
     });
-              await gameProgress.saveProgress();
-
+    await gameProgress.saveProgress();
 
     debugPrint(
       'Answer: $userAnswer | '
@@ -313,8 +366,14 @@ if (currentLevel == 1) {
                         children: [
                           // LEVEL
                           Text(
-                            'LEVEL ${gameProgress.additionLevel}',
-                            style:const TextStyle(
+                            'LEVEL ${widget.operation == '+'
+                                ? gameProgress.additionLevel
+                                : widget.operation == '-'
+                                    ? gameProgress.subtractionLevel
+                                    : widget.operation == '*'
+                                        ? gameProgress.multiplicationLevel
+                                        : gameProgress.divisionLevel}',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'game.dart';
 import 'progress.dart';
 
-class OperationScreen extends StatelessWidget {
+class OperationScreen extends StatefulWidget {
   const OperationScreen({super.key});
+  @override
+  State<OperationScreen> createState() => _OperationScreenState();
+}
+
+class _OperationScreenState extends State<OperationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,14 +111,20 @@ class OperationScreen extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: unlocked
-          ? () {
-              Navigator.push(
+          ? () async {
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) =>  GameScreen(
-                    operation: operation,
-
-                )),
+                MaterialPageRoute(
+                  builder: (context) => GameScreen(operation: operation),
+                ),
               );
+              // Reload saved progress
+              await gameProgress.loadProgress();
+
+              // Update the operation screen
+              if (mounted) {
+                setState(() {});
+              }
             }
           : null,
 
